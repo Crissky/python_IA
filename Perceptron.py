@@ -1,8 +1,8 @@
 class Perceptron:
-    def __init__(self, inputs=[], weights=[], expected_output=[], threshold=1, learning_rate=0.1):
-        self.inputs = inputs;
+    def __init__(self, training_inputs=[], weights=[], labels=[], threshold=1, learning_rate=0.1):
+        self.training_inputs = training_inputs;
         self.weights = weights;
-        self.expected_output = expected_output;
+        self.labels = labels;
         self.threshold = threshold;
         self.learning_rate = learning_rate;
 
@@ -11,27 +11,27 @@ class Perceptron:
         text = '';
         text += "Limiar: " + str(self.threshold) + space;
         text += "Taxa de aprendizado: " + str(self.learning_rate) + space;
-        text += "Entradas: " + str(self.inputs) + space;
+        text += "Entradas: " + str(self.training_inputs) + space;
         text += "Pesos: " + str(self.weights);
 
         return text;
 
     def checkInputs(self):
-        len_first_input = len(self.inputs[0]);
-        is_input = all(len(my_input) == len_first_input for my_input in self.inputs);
+        len_first_input = len(self.training_inputs[0]);
+        is_input = all(len(my_input) == len_first_input for my_input in self.training_inputs);
         if(not is_input):
             raise Exception('Suas ENTRADAS não tem o mesmo tamanho.');
 
     def checkVector(self):
-        len_input = len(self.inputs[0]);
-        len_inputs = len(self.inputs);
+        len_input = len(self.training_inputs[0]);
+        len_inputs = len(self.training_inputs);
         len_weights = len(self.weights);
-        len_expected_output = len(self.expected_output);
+        len_labels = len(self.labels);
         self.checkInputs();
         if(len_input != len_weights):
             raise Exception('O TAMANHO das ENTRADAS ({}) é diferente do TAMANHO dos PESOS ({})'.format(len_input, len_weights));
-        if(len_inputs != len_expected_output):
-            raise Exception('O total de ENTRADAS ({}) é diferente do total de SAÍDAS ESPERADAS ({})'.format(len_inputs, len_expected_output));
+        if(len_inputs != len_labels):
+            raise Exception('O total de ENTRADAS ({}) é diferente do total de SAÍDAS ESPERADAS ({})'.format(len_inputs, len_labels));
         
     def productSingleVectors(self, my_input):
         new_vector = [x * y for x, y in zip(my_input, self.weights)];
@@ -73,11 +73,11 @@ class Perceptron:
             current_epoch += 1;
             num_epochs -= 1;
             print('Época: {}'.format(current_epoch));
-            for index in range(len(self.inputs)):
-                my_input = self.inputs[index];
+            for index in range(len(self.training_inputs)):
+                my_input = self.training_inputs[index];
                 product = self.productSingleVectors(my_input);
                 output = self.toBinaryOutput(product);
-                is_updated = self.updateWeights(my_input, output, self.expected_output[index]);
+                is_updated = self.updateWeights(my_input, output, self.labels[index]);
 
                 if(all_in and is_updated):
                     all_in = False;
@@ -89,12 +89,15 @@ class Perceptron:
             
 
 if(__name__ == '__main__'):
-    inputs = [(0,0), (0,1),(1,0),(1,1)];
+    training_inputs = [(0,0), (0,1),(1,0),(1,1)];
     weights = [0.2, -0.1];
-    expected_output = [0, 0, 0, 1];
+    labels = [0, 0, 0, 1];
     threshold = 0.2;
     learning_rate = 0.1;
     
-    perceptron = Perceptron(inputs, weights, expected_output, threshold, learning_rate);
-    perceptron.train(num_epochs=-1)
+    perceptron = Perceptron(training_inputs, weights, labels, threshold, learning_rate);
+    perceptron.train(num_epochs=-1);
+    print("predict [0,0]:", perceptron.predict([0,0]));
+    print("predict [1,1]:", perceptron.predict([1,1]));
+    print();
     print(perceptron);
